@@ -14,3 +14,15 @@ fs -rm -f -r output;
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+datos = LOAD 'data.tsv' AS (f1:CHARARRAY, f2:BAG{(f2a:CHARARRAY)}, f3:MAP[]);
+
+temp1 = FOREACH datos GENERATE FLATTEN(f2) AS f0, FLATTEN(f3) AS (f1:CHARARRAY, f2:CHARARRAY);
+temp2 = FOREACH temp1 GENERATE $0, $1;
+temp3 = ORDER temp2 BY $0, $1;
+temp4 = GROUP temp3 BY ($0, $1);
+
+contador = FOREACH temp4 GENERATE group, COUNT(temp3);
+
+-- escribe el archivo de salida
+STORE contador INTO 'output' USING PigStorage ();

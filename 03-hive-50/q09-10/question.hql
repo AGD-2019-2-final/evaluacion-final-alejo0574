@@ -39,3 +39,18 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+-- crear tabla e instruccion resultado
+DROP TABLE IF EXISTS temp1;
+
+CREATE TABLE temp1 AS
+    SELECT t0.c1,t0.c2, t1.c4[t0.c2] FROM tbl0 t0 
+        INNER JOIN tbl1 t1 on t0.c1 = t1.c1;
+
+-- guardar resultado en output
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM temp1;
+
+-- pasar del hdfs al local 
+!hadoop fs -copyToLocal /tmp/output output;  

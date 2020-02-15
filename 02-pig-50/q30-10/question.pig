@@ -40,4 +40,28 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+temp1 = FOREACH u GENERATE ToString(ToDate(birthday,'yyyy-MM-dd'),'yyyy-MM-dd'), ToString(ToDate(birthday,'yyyy-MM-dd'),'dd'), ToString(ToDate(birthday,'yyyy-MM-dd'),'d'), ToString(ToDate(birthday,'yyyy-MM-dd'),'EEE'), ToString(ToDate(birthday,'yyyy-MM-dd'),'EEEE');
+temp2 = FOREACH temp1 GENERATE $0,$1,$2,(
+    CASE $3
+        WHEN 'Thu' THEN 'jue'
+        WHEN 'Sun' THEN 'dom'
+        WHEN 'Wed' THEN 'mie'
+        WHEN 'Fri' THEN 'vie'
+        WHEN 'Mon' THEN 'lun'
+        WHEN 'Tue' THEN 'mar'
+    END
+),(
+    CASE $4
+        WHEN 'Thursday' THEN 'jueves'
+        WHEN 'Sunday' THEN 'domingo'
+        WHEN 'Wednesday' THEN 'miercoles'
+        WHEN 'Friday' THEN 'viernes'
+        WHEN 'Monday' THEN 'lunes'
+        WHEN 'Tuesday' THEN 'martes'
+    
+    
+    END
+);
 
+-- escribe el archivo de salida
+STORE temp2 INTO 'output' USING PigStorage(',');

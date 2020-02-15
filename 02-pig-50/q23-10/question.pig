@@ -28,4 +28,9 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+temp1 = FOREACH u GENERATE firstname, color;   
 
+filtro = FILTER temp1 BY (color  MATCHES '.*(a|e|i|o|u)');
+
+-- escribe el archivo de salida
+STORE filtro INTO 'output' USING PigStorage(',');

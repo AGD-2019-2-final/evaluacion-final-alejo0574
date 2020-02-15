@@ -40,3 +40,20 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+-- crear tabla e instruccion resultado
+DROP TABLE IF EXISTS temp1;
+
+CREATE TABLE temp1 AS
+
+SELECT anio, letra, count(*) FROM 
+    (SELECT YEAR(c4) AS anio, letra FROM tbl0 lateral view explode(c5) l AS letra) a
+        GROUP BY anio, letra;
+
+
+-- guardar resultado en output
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM temp1;
+
+-- pasar del hdfs al local 
+!hadoop fs -copyToLocal /tmp/output output;

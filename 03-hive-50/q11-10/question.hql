@@ -23,4 +23,17 @@ LOAD DATA LOCAL INPATH 'data.tsv' INTO TABLE t0;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+-- crear tabla e instruccion resultado
+DROP TABLE IF EXISTS temp1;
 
+CREATE TABLE temp1 AS
+    SELECT c1, SIZE(c2), SIZE(c3) FROM t0;
+
+
+-- guardar resultado en output
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM temp1;
+
+-- pasar del hdfs al local 
+!hadoop fs -copyToLocal /tmp/output output;  

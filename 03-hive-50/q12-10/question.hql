@@ -27,4 +27,19 @@ LOAD DATA LOCAL INPATH 'data.tsv' INTO TABLE t0;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+-- crear tabla e instruccion resultado
+DROP TABLE IF EXISTS temp1;
 
+CREATE TABLE temp1 AS
+    SELECT k1,k2, count(*) FROM t0
+        LATERAL VIEW explode(c2) table1 as k1
+            LATERAL VIEW explode(c3) table2 AS k2, k3
+                GROUP BY k1, k2;
+
+-- guardar resultado en output
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM temp1;
+
+-- pasar del hdfs al local 
+!hadoop fs -copyToLocal /tmp/output output;  

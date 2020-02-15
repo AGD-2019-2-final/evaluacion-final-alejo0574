@@ -40,4 +40,17 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+-- crear tabla e instruccion resultado
+DROP TABLE IF EXISTS temp1;
 
+CREATE TABLE temp1 AS
+
+    SELECT c2, concat_ws(':', collect_list(cast(c1 AS STRING))) FROM tbl0 GROUP BY c2;
+
+-- guardar resultado en output
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM temp1;
+
+-- pasar del hdfs al local 
+!hadoop fs -copyToLocal /tmp/output output;  

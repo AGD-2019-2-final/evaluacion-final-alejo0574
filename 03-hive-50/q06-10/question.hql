@@ -40,4 +40,19 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+-- crear tabla e instruccion resultado
+DROP TABLE IF EXISTS temp1;
 
+CREATE TABLE temp1 AS
+
+SELECT concat_ws(':', collect_list(UPPER(exploded))) FROM tbl0 
+    LATERAL VIEW explode(c5) exploded_table as exploded
+        GROUP BY c1;
+
+-- guardar resultado en output
+INSERT OVERWRITE DIRECTORY '/tmp/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM temp1;
+
+-- pasar del hdfs al local 
+!hadoop fs -copyToLocal /tmp/output output;
